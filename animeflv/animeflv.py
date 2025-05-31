@@ -46,8 +46,7 @@ BASE_URL = "https://animeflv.net"
 BROWSE_URL = "https://animeflv.net/browse"
 ANIME_VIDEO_URL = "https://animeflv.net/ver/"
 ANIME_URL = "https://animeflv.net/anime/"
-BASE_EPISODE_IMG_URL = "https://cdn.animeflv.net/screenshots/"
-
+BASE_EPISODE_IMG_URL = "https://vww.animeflv.one/cdn/img/episodios/"
 
 @dataclass
 class EpisodeInfo:
@@ -344,7 +343,7 @@ class AnimeFLV(object):
                     EpisodeInfo(
                         id=episode,
                         anime=id,
-                        image_preview=f"{BASE_EPISODE_IMG_URL}{AnimeThumbnailsId}/{episode}/th_3.jpg",
+                        image_preview=f"{BASE_EPISODE_IMG_URL}{AnimeThumbnailsId}-{episode}.webp",
                     )
                 )
 
