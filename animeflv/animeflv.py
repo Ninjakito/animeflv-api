@@ -121,6 +121,16 @@ class AnimeFLV(object):
         if response.status_code != 200:
             raise AnimeFLVUnauthorizedError("Login failed, check your credentials.")
 
+    def logout(self) -> None:
+        """
+        Logout from animeflv.net.
+        """
+
+        response = self._scraper.get(f"https://www3.animeflv.net/auth/sign_out")
+
+        if response.status_code != 200:
+            raise AnimeFLVUnauthorizedError("Logout failed, check your session.")
+
     def add_anime_to_favorite(self, internal_id: int) -> None:
         """
         Add an anime to the library.
