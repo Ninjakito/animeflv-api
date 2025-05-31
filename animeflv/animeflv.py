@@ -220,6 +220,53 @@ class AnimeFLV(object):
                 f"Error on modify library: {response.json().get('error')}"
             )
 
+    def mark_episode_as_watched(self, internal_id: int, episode: int) -> None:
+        """
+        Mark an episode as watched.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        :param episode: Episode number to mark.
+        """
+
+        self._mark_episode(internal_id, episode, Action.SEEN)
+        
+    def mark_episode_as_unwatched(self, internal_id: int, episode: int) -> None:
+        """
+        Mark an episode as unwatched.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        :param episode: Episode number to mark.
+        """
+
+        self._mark_episode(internal_id, episode, Action.UNSEEN)
+
+    def _mark_episode(self, internal_id: int, episode: int, action: Action) -> None:
+        """
+        Mark an episode as watched or unwatched.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        :param episode: Episode number to mark.
+        :param action: SEEN to mark as watched, UNSEEN to mark as unwatched.
+        """
+
+        data = {"anime_id": internal_id, "number": episode, "seen": action.value}
+
+        response = self._scraper.post(
+            f"{BASE_API_URL}/animes/markEpisode",
+            data=data,
+        )
+
+        if response.json().get("error"):
+            if response.json().get("error") == "users.not_logged":
+                raise AnimeFLVUnauthorizedError("User not logged in")
+            elif response.json().get("error") == "animes.not_found":
+                raise AnimeFLVActionError("Error on mark episode, anime not found")
+            else:
+                raise AnimeFLVActionError(f"Error on mark episode: {response.json().get('error')}")
+
+        if response.status_code != 200:
+            raise AnimeFLVActionError(f"Error on mark episode: {response.json().get('error')}")
+
     def get_links(
         self,
         id: str,

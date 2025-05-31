@@ -8,3 +8,5 @@ class LibraryAction(str, Enum):
 class Action(int, Enum):
     ADD = 0
     REMOVE = 1
+    SEEN = 1
+    UNSEEN = 0
