@@ -361,6 +361,7 @@ class AnimeFLV(object):
     def get_user_favorites(self, username: str, page: int = 1) -> List[AnimeInfo]:
         """
         Get the list of animes saved in a user's favorites.
+        
         :param username: The username whose favorites to fetch.
         :param page: The page number to fetch.
         :rtype: list[AnimeInfo]
@@ -370,6 +371,7 @@ class AnimeFLV(object):
     def get_user_following(self, username: str, page: int = 1) -> List[AnimeInfo]:
         """
         Get the list of animes that a user is following.
+        
         :param username: The username whose following to fetch.
         :param page: The page number to fetch.
         :rtype: list[AnimeInfo]
@@ -379,6 +381,7 @@ class AnimeFLV(object):
     def get_user_watchlist(self, username: str, page: int = 1) -> List[AnimeInfo]:
         """
         Get the list of animes in a user's watchlist.
+        
         :param username: The username whose watchlist to fetch.
         :param page: The page number to fetch.
         :rtype: list[AnimeInfo]
@@ -388,6 +391,7 @@ class AnimeFLV(object):
     def _get_user_library(self, username: str, library: LibraryType, page: int = 1) -> List[AnimeInfo]:
         """
         Get the list of animes saved in a user's library.
+        
         :param username: The username whose library to fetch.
         :param library: The type of library to fetch ("favoritos", "siguiendo", "lista_espera").
         :rtype: list[AnimeInfo]
