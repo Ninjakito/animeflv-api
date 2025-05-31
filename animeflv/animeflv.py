@@ -84,9 +84,15 @@ class EpisodeFormat(Flag):
 
 
 class AnimeFLV(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, username: str = None, password: str = None, *args, **kwargs):
         session = kwargs.get("session", None)
         self._scraper = cloudscraper.create_scraper(session)
+        
+        self.username = username
+        self.password = password
+        
+        if username and password:
+            self.login(username, password)
 
     def close(self) -> None:
         self._scraper.close()
@@ -120,6 +126,9 @@ class AnimeFLV(object):
 
         if response.status_code != 200:
             raise AnimeFLVUnauthorizedError("Login failed, check your credentials.")
+        
+        self.username = username
+        self.password = password
 
     def logout(self) -> None:
         """
