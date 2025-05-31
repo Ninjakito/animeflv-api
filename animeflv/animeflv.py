@@ -44,6 +44,7 @@ def parse_table(table: Tag):
 
 
 BASE_URL = "https://animeflv.net"
+BASE_API_URL = "https://www3.animeflv.net/api"
 BROWSE_URL = "https://animeflv.net/browse"
 ANIME_VIDEO_URL = "https://animeflv.net/ver/"
 ANIME_URL = "https://animeflv.net/anime/"
@@ -192,13 +193,13 @@ class AnimeFLV(object):
         Required to be logged in with the login function.
         :param internal_id: Internal id of the anime.
         :param library: Library type to add/remove the anime.
-        :param action: True to add, False to remove.
+        :param action: ADD to add, REMOVE to remove.
         """
         
         data = {"anime_id": internal_id, "action": library.value, "do": action.value}
 
         response = self._scraper.post(
-            f"https://www3.animeflv.net/api/animes/library",
+            f"{BASE_API_URL}/animes/library",
             data=data,
         )
 
@@ -206,17 +207,17 @@ class AnimeFLV(object):
             if response.json().get("error") == "users.not_logged":
                 raise AnimeFLVUnauthorizedError("User not logged in")
             elif response.json().get("error") == "animes.not_valid_action":
-                raise AnimeFLVActionError("Error to modify library, invalid action")
+                raise AnimeFLVActionError("Error on modify library, invalid action")
             elif response.json().get("error") == "animes.not_found":
-                raise AnimeFLVActionError("Error to modify library, anime not found")
+                raise AnimeFLVActionError("Error on modify library, anime not found")
             else:
                 raise AnimeFLVActionError(
-                    f"Error to modify library: {response.json().get('error')}"
+                    f"Error on modify library: {response.json().get('error')}"
                 )
 
         if response.status_code != 200:
             raise AnimeFLVActionError(
-                f"Error to modify library: {response.json().get('error')}"
+                f"Error on modify library: {response.json().get('error')}"
             )
 
     def get_links(
