@@ -358,6 +358,55 @@ class AnimeFLV(object):
             **information,
         )
 
+    def get_user_favorites(self, username: str, page: int = 1) -> List[AnimeInfo]:
+        """
+        Get the list of animes saved in a user's favorites.
+        :param username: The username whose favorites to fetch.
+        :param page: The page number to fetch.
+        :rtype: list[AnimeInfo]
+        """
+        return self._get_user_library(username, "favoritos", page)
+    
+    def get_user_following(self, username: str, page: int = 1) -> List[AnimeInfo]:
+        """
+        Get the list of animes that a user is following.
+        :param username: The username whose following to fetch.
+        :param page: The page number to fetch.
+        :rtype: list[AnimeInfo]
+        """
+        return self._get_user_library(username, "siguiendo", page)
+    
+    def get_user_watchlist(self, username: str, page: int = 1) -> List[AnimeInfo]:
+        """
+        Get the list of animes in a user's watchlist.
+        :param username: The username whose watchlist to fetch.
+        :param page: The page number to fetch.
+        :rtype: list[AnimeInfo]
+        """
+        return self._get_user_library(username, "lista_espera", page)
+
+    def _get_user_library(self, username: str, library: str, page: int = 1) -> List[AnimeInfo]:
+        """
+        Get the list of animes saved in a user's library.
+        :param username: The username whose library to fetch.
+        :param library: The type of library to fetch ("favoritos", "siguiendo", "lista_espera").
+        :rtype: list[AnimeInfo]
+        """
+        url = f"{BASE_URL}/perfil/{username}/{library}?page={page}"
+        response = self._scraper.get(url)
+        
+        if response.status_code == 404:
+            raise AnimeFLVParseError(f"User {username} not found.")
+        
+        soup = BeautifulSoup(response.text, "lxml")
+
+        elements = soup.select("ul.ListAnimes li article")
+
+        if elements is None:
+            raise AnimeFLVParseError("Unable to get list of animes")
+
+        return self._process_anime_library_info(elements)
+
     def _process_anime_list_info(self, elements: ResultSet) -> List[AnimeInfo]:
         ret = []
 
@@ -399,6 +448,43 @@ class AnimeFLV(object):
                     )
                 )
             except Exception as exc:
+                raise AnimeFLVParseError(exc)
+
+        return ret
+
+    def _process_anime_library_info(self, elements: ResultSet) -> List[AnimeInfo]:
+        ret = []
+        
+        for element in elements:
+            try:
+                ret.append(
+                    AnimeInfo(
+                        id=removeprefix(
+                            element.select_one("h3.Title a")["href"][1:],
+                            "anime/",
+                        ),
+                        title=element.select_one("h3.Title a").text,
+                        poster=(
+                            f"{BASE_URL}{element.select_one('div.Image figure img').get('src', None)}"
+                            or f"{BASE_URL}{element.select_one('div.Image figure img')['data-cfsrc']}"
+                        ),
+                        banner=(
+                            f"{BASE_URL}{element.select_one('div.Image figure img').get('src', None)}"
+                            or f"{BASE_URL}{element.select_one('div.Image figure img')['data-cfsrc']}"
+                        ),
+                        type=element.select_one("div.Image span.Type").text,
+                        synopsis=element.select("div.Image div.Description p")[0].text.strip(),
+                        rating=element.select_one("div.Image div.Description div.Vts").text,
+                        debut=(
+                            element.select_one("a span.Estreno").text.lower()
+                            if element.select_one("a span.Estreno")
+                            else None
+                        ),
+                    )
+                )
+            except Exception as exc:
+                print(element.select("div.Image div.Description p")[0].text)
+                exit()
                 raise AnimeFLVParseError(exc)
 
         return ret
