@@ -110,6 +110,7 @@ class AnimeFLV(object):
     def login(self, username: str, password: str) -> None:
         """
         Login to animeflv.net with username and password.
+        
         :param username: Username of the account.
         :param password: Password of the account.
         """
@@ -146,6 +147,7 @@ class AnimeFLV(object):
         """
         Add an anime to the library.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         """
 
@@ -157,6 +159,7 @@ class AnimeFLV(object):
         """
         Remove an anime from the library.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         """
 
@@ -168,6 +171,7 @@ class AnimeFLV(object):
         """
         Add an anime to the following library.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         """
 
@@ -179,6 +183,7 @@ class AnimeFLV(object):
         """
         Remove an anime from the following library.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         """
 
@@ -190,6 +195,7 @@ class AnimeFLV(object):
         """
         Add an anime to the watchlist library.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         """
 
@@ -201,6 +207,7 @@ class AnimeFLV(object):
         """
         Remove an anime from the watchlist library.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         """
 
@@ -212,6 +219,7 @@ class AnimeFLV(object):
         """
         Add or remove an anime from the library.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         :param library: Library type to add/remove the anime.
         :param action: ADD to add, REMOVE to remove.
@@ -250,6 +258,7 @@ class AnimeFLV(object):
         Mark an episode as watched.
         Required to be logged in with the login function.
         Marking an episode as watched causes all previous episodes to be marked as watched.
+        
         :param internal_id: Internal id of the anime.
         :param episode: Episode number to mark.
         """
@@ -261,6 +270,7 @@ class AnimeFLV(object):
         Mark an episode as unwatched.
         Required to be logged in with the login function.
         Marking an episode as unwatched causes all previous episodes to be marked as unwatched.
+        
         :param internal_id: Internal id of the anime.
         :param episode: Episode number to mark.
         """
@@ -271,6 +281,7 @@ class AnimeFLV(object):
         """
         Mark an episode as watched or unwatched.
         Required to be logged in with the login function.
+        
         :param internal_id: Internal id of the anime.
         :param episode: Episode number to mark.
         :param action: SEEN to mark as watched, UNSEEN to mark as unwatched.
