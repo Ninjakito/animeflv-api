@@ -6,7 +6,7 @@ from types import TracebackType
 from bs4 import BeautifulSoup, Tag, ResultSet
 from urllib.parse import unquote, urlencode
 from enum import Flag, auto
-from .exception import AnimeFLVParseError
+from .exception import AnimeFLVParseError, AnimeFLVUnauthorizedError
 from dataclasses import dataclass
 
 
@@ -99,6 +99,25 @@ class AnimeFLV(object):
         exc_tb: Optional[TracebackType],
     ) -> None:
         self.close()
+
+    def login(self, username: str, password: str) -> None:
+        """
+        Login to animeflv.net with username and password.
+        :param username: Username of the account.
+        :param password: Password of the account.
+        """
+
+        response = self._scraper.post(
+            f"https://www3.animeflv.net/auth/sign_in",
+            data={
+                "email": username,
+                "password": password,
+                "remember_me": 0,
+            },
+        )
+
+        if response.status_code != 200:
+            raise AnimeFLVUnauthorizedError("Login failed, check your credentials.")
 
     def get_links(
         self,
