@@ -8,7 +8,7 @@ from urllib.parse import unquote, urlencode
 from enum import Flag, auto
 from .exception import AnimeFLVParseError
 from dataclasses import dataclass
-
+from .enum import LibraryType
 
 def removeprefix(str: str, prefix: str) -> str:
     """
@@ -365,7 +365,7 @@ class AnimeFLV(object):
         :param page: The page number to fetch.
         :rtype: list[AnimeInfo]
         """
-        return self._get_user_library(username, "favoritos", page)
+        return self._get_user_library(username, LibraryType.FAVORITES, page)
     
     def get_user_following(self, username: str, page: int = 1) -> List[AnimeInfo]:
         """
@@ -374,7 +374,7 @@ class AnimeFLV(object):
         :param page: The page number to fetch.
         :rtype: list[AnimeInfo]
         """
-        return self._get_user_library(username, "siguiendo", page)
+        return self._get_user_library(username, LibraryType.FOLLOWING, page)
     
     def get_user_watchlist(self, username: str, page: int = 1) -> List[AnimeInfo]:
         """
@@ -383,9 +383,9 @@ class AnimeFLV(object):
         :param page: The page number to fetch.
         :rtype: list[AnimeInfo]
         """
-        return self._get_user_library(username, "lista_espera", page)
+        return self._get_user_library(username, LibraryType.WATCHLIST, page)
 
-    def _get_user_library(self, username: str, library: str, page: int = 1) -> List[AnimeInfo]:
+    def _get_user_library(self, username: str, library: LibraryType, page: int = 1) -> List[AnimeInfo]:
         """
         Get the list of animes saved in a user's library.
         :param username: The username whose library to fetch.
