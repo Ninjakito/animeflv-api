@@ -124,7 +124,7 @@ class AnimeFLV(object):
             },
         )
 
-        if response.status_code != 200:
+        if response.status_code != 200 or "login" not in self._scraper.cookies:
             raise AnimeFLVUnauthorizedError("Login failed, check your credentials.")
         
         self.username = username
@@ -139,6 +139,9 @@ class AnimeFLV(object):
 
         if response.status_code != 200:
             raise AnimeFLVUnauthorizedError("Logout failed, check your session.")
+        
+        self.username = None
+        self.password = None
 
     def add_anime_to_favorite(self, internal_id: int) -> None:
         """
@@ -224,6 +227,10 @@ class AnimeFLV(object):
 
         if response.json().get("error"):
             if response.json().get("error") == "users.not_logged":
+                if self.username and self.password:
+                    self.login(self.username, self.password)
+                    self._modify_anime_library(internal_id, library, action)
+                
                 raise AnimeFLVUnauthorizedError("User not logged in")
             elif response.json().get("error") == "animes.not_valid_action":
                 raise AnimeFLVActionError("Error on modify library, invalid action")
@@ -277,6 +284,10 @@ class AnimeFLV(object):
 
         if response.json().get("error"):
             if response.json().get("error") == "users.not_logged":
+                if self.username and self.password:
+                    self.login(self.username, self.password)
+                    self._mark_episode(internal_id, episode, action)
+                
                 raise AnimeFLVUnauthorizedError("User not logged in")
             elif response.json().get("error") == "animes.not_found":
                 raise AnimeFLVActionError("Error on mark episode, anime not found")
