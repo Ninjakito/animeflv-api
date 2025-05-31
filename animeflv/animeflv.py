@@ -6,8 +6,9 @@ from types import TracebackType
 from bs4 import BeautifulSoup, Tag, ResultSet
 from urllib.parse import unquote, urlencode
 from enum import Flag, auto
-from .exception import AnimeFLVParseError, AnimeFLVUnauthorizedError
+from .exception import AnimeFLVParseError, AnimeFLVUnauthorizedError, AnimeFLVActionError
 from dataclasses import dataclass
+from .enum import LibraryAction, Action
 
 
 def removeprefix(str: str, prefix: str) -> str:
@@ -118,6 +119,105 @@ class AnimeFLV(object):
 
         if response.status_code != 200:
             raise AnimeFLVUnauthorizedError("Login failed, check your credentials.")
+
+    def add_anime_to_favorite(self, internal_id: int) -> None:
+        """
+        Add an anime to the library.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        """
+
+        self._modify_anime_library(
+            internal_id, LibraryAction.FAVORITES, Action.ADD
+        )
+    
+    def remove_anime_from_favorite(self, internal_id: int) -> None:
+        """
+        Remove an anime from the library.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        """
+
+        self._modify_anime_library(
+            internal_id, LibraryAction.FAVORITES, Action.REMOVE
+        )
+        
+    def add_anime_to_following(self, internal_id: int) -> None:
+        """
+        Add an anime to the following library.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        """
+
+        self._modify_anime_library(
+            internal_id, LibraryAction.FOLLOWING, Action.ADD
+        )
+        
+    def remove_anime_from_following(self, internal_id: int) -> None:
+        """
+        Remove an anime from the following library.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        """
+
+        self._modify_anime_library(
+            internal_id, LibraryAction.FOLLOWING, Action.REMOVE
+        )
+        
+    def add_anime_to_watchlist(self, internal_id: int) -> None:
+        """
+        Add an anime to the watchlist library.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        """
+
+        self._modify_anime_library(
+            internal_id, LibraryAction.WATCHLIST, Action.ADD
+        )
+        
+    def remove_anime_from_watchlist(self, internal_id: int) -> None:
+        """
+        Remove an anime from the watchlist library.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        """
+
+        self._modify_anime_library(
+            internal_id, LibraryAction.WATCHLIST, Action.REMOVE
+        )
+
+    def _modify_anime_library(self, internal_id: int, library: LibraryAction, action: Action) -> None:
+        """
+        Add or remove an anime from the library.
+        Required to be logged in with the login function.
+        :param internal_id: Internal id of the anime.
+        :param library: Library type to add/remove the anime.
+        :param action: True to add, False to remove.
+        """
+        
+        data = {"anime_id": internal_id, "action": library.value, "do": action.value}
+
+        response = self._scraper.post(
+            f"https://www3.animeflv.net/api/animes/library",
+            data=data,
+        )
+
+        if response.json().get("error"):
+            if response.json().get("error") == "users.not_logged":
+                raise AnimeFLVUnauthorizedError("User not logged in")
+            elif response.json().get("error") == "animes.not_valid_action":
+                raise AnimeFLVActionError("Error to modify library, invalid action")
+            elif response.json().get("error") == "animes.not_found":
+                raise AnimeFLVActionError("Error to modify library, anime not found")
+            else:
+                raise AnimeFLVActionError(
+                    f"Error to modify library: {response.json().get('error')}"
+                )
+
+        if response.status_code != 200:
+            raise AnimeFLVActionError(
+                f"Error to modify library: {response.json().get('error')}"
+            )
 
     def get_links(
         self,
