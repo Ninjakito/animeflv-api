@@ -43,8 +43,7 @@ def parse_table(table: Tag):
     return rows
 
 
-BASE_URL = "https://animeflv.net"
-BASE_API_URL = "https://www3.animeflv.net/api"
+BASE_URL = "https://www3.animeflv.net"
 BROWSE_URL = "https://animeflv.net/browse"
 ANIME_VIDEO_URL = "https://animeflv.net/ver/"
 ANIME_URL = "https://animeflv.net/anime/"
@@ -116,11 +115,11 @@ class AnimeFLV(object):
         """
 
         response = self._scraper.post(
-            f"https://www3.animeflv.net/auth/sign_in",
+            f"{BASE_URL}/auth/sign_in",
             data={
                 "email": username,
                 "password": password,
-                "remember_me": 0,
+                "remember_me": 1,
             },
         )
 
@@ -135,7 +134,7 @@ class AnimeFLV(object):
         Logout from animeflv.net.
         """
 
-        response = self._scraper.get(f"https://www3.animeflv.net/auth/sign_out")
+        response = self._scraper.get(f"{BASE_URL}/auth/sign_out")
 
         if response.status_code != 200:
             raise AnimeFLVUnauthorizedError("Logout failed, check your session.")
@@ -221,7 +220,7 @@ class AnimeFLV(object):
         data = {"anime_id": internal_id, "action": library.value, "do": action.value}
 
         response = self._scraper.post(
-            f"{BASE_API_URL}/animes/library",
+            f"{BASE_URL}/api/animes/library",
             data=data,
         )
 
@@ -250,6 +249,7 @@ class AnimeFLV(object):
         """
         Mark an episode as watched.
         Required to be logged in with the login function.
+        Marking an episode as watched causes all previous episodes to be marked as watched.
         :param internal_id: Internal id of the anime.
         :param episode: Episode number to mark.
         """
@@ -260,6 +260,7 @@ class AnimeFLV(object):
         """
         Mark an episode as unwatched.
         Required to be logged in with the login function.
+        Marking an episode as unwatched causes all previous episodes to be marked as unwatched.
         :param internal_id: Internal id of the anime.
         :param episode: Episode number to mark.
         """
@@ -278,7 +279,7 @@ class AnimeFLV(object):
         data = {"anime_id": internal_id, "number": episode, "seen": action.value}
 
         response = self._scraper.post(
-            f"{BASE_API_URL}/animes/markEpisode",
+            f"{BASE_URL}/api/animes/markEpisode",
             data=data,
         )
 
